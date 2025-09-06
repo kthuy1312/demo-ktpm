@@ -24,18 +24,18 @@ const emailSchema =
             const existingUser = await isEmailExist(email);
             return !existingUser;
         }, {
-            message: "Email already exists",
+            message: "Email đã được đăng ký, vui lòng sử dụng email khác",
             path: ["email"],
         });
 
 export const RegisterSchema = z.object({
-    fullName: z.string().trim().min(1, { message: "Tên không được để trống" }),
+    name: z.string().trim().min(1, { message: "Tên không được để trống" }),
     email: emailSchema,
     password: passwordSchema,
     confirmPassword: z.string(),
 })
     .refine((data) => data.password === data.confirmPassword, {
-        message: "Password confirm không chính xác",
+        message: "Mật khẩu xác nhận không khớp, vui lòng nhập lại",
         path: ['confirmPassword'],
     });;
 
