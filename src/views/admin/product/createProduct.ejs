@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Apple Store Manager" />
+    <meta name="author" content="Admin" />
+    <title>Manager Product</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+    <link href="/admin/css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(() => {
+            // preview ảnh sản phẩm chính
+            $("#productImgFile").change(function (e) {
+                const imgURL = URL.createObjectURL(e.target.files[0]);
+                $("#productImgPreview").attr("src", imgURL).show();
+            });
+
+            // thêm dòng biến thể
+            $("#addVariantBtn").click(() => {
+                const variantRow = `
+          <div class="variant-row row g-2 mb-2">
+            <div class="col-3">
+              <input type="text"name="color[]" class="form-control" placeholder="Màu sắc">
+            </div>
+            <div class="col-3">
+              <input type="text" name="storage[]" class="form-control" placeholder="Dung lượng (vd: 256GB)">
+            </div>
+            <div class="col-2">
+              <input type="number" name="price[]" class="form-control" placeholder="Giá">
+            </div>
+            <div class="col-1">
+              <input type="number" name="stock[]" class="form-control" placeholder="SL">
+            </div>
+            <div class="col-1 d-flex align-items-center">
+              <button type="button" class="btn btn-sm btn-danger remove-variant"><i class="fas fa-times"></i></button>
+            </div>
+          </div>`;
+                $("#variantContainer").append(variantRow);
+            });
+
+            // xoá dòng biến thể
+            $(document).on("click", ".remove-variant", function () {
+                $(this).closest(".variant-row").remove();
+            });
+        });
+    </script>
+</head>
+
+<body class="sb-nav-fixed">
+    <%- include('../layout/header'); %>
+
+        <div id="layoutSidenav">
+            <%- include('../layout/sidenav'); %>
+
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid px-4">
+                            <h1 class="mt-4">Manage Products</h1>
+                            <ol class="breadcrumb mb-4">
+                                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                                <li class="breadcrumb-item active">Products</li>
+                            </ol>
+
+                            <div style="width:800px; margin:30px auto">
+                                <h4>Create Product</h4>
+                                <hr />
+                                <form action="/admin/create-product" method="post" enctype="multipart/form-data">
+                                    <!-- Thông tin sản phẩm -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Tên sản phẩm:</label>
+                                        <input type="text" name="name" class="form-control">
+                                    </div>
+
+                                    <div class="row">
+                                        <!-- Category -->
+                                        <div class="mb-3 col-6">
+                                            <label class="form-label">Loại sản phẩm:</label>
+                                            <select name="category_id" class="form-select" required>
+                                                <% categories.forEach(function(category) { %>
+                                                    <option value="<%= category.category_id %>">
+                                                        <%= category.name %>
+                                                    </option>
+                                                    <% }); %>
+                                            </select>
+                                        </div>
+
+                                        <!-- Base Price -->
+                                        <div class="mb-3 col-6">
+                                            <label class="form-label">Giá:</label>
+                                            <input type="number" name="basePrice" class="form-control" required>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="mb-3">
+                                        <label for="formFile" class="form-label">Ảnh sản phẩm:</label>
+                                        <input name="productImg" class="form-control" type="file" id="productImgFile"
+                                            accept=".png, .jpg, .jpeg">
+                                        <div class="mt-3">
+                                            <img style="max-height: 200px; display: none;" alt="preview"
+                                                id="productImgPreview" />
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Mô tả:</label>
+                                        <textarea class="form-control" name="description" rows="3"></textarea>
+                                    </div>
+
+                                    <!-- Phân loại sản phẩm -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Phân loại (Variants):</label>
+                                        <div id="variantContainer"></div>
+                                        <button type="button" id="addVariantBtn" class="btn btn-sm btn-secondary mt-2">
+                                            + Thêm phân loại
+                                        </button>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <button type="submit" class="btn btn-warning">Thêm sản phẩm</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </main>
+                    <%- include('../layout/footer'); %>
+                </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"></script>
+        <script src="/admin/js/scripts.js"></script>
+</body>
+
+</html>

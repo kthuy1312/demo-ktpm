@@ -1,0 +1,146 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String // Tên sản phẩm: iPhone 15 Pro Max, MacBook Air M3
+  description String?  @db.LongText
+  basePrice   Decimal // Giá cơ bản
+  image       String?
+  category_id Int
+  category    Category @relation(fields: [category_id], references: [category_id])
+
+  variants ProductVariant[]
+  reviews  Review[]
+
+  @@map("products")
+}
+
+model ProductVariant {
+  id         Int     @id @default(autoincrement())
+  product_id Int
+  color      String // Ví dụ: "Blue Titanium", "Starlight", "Midnight"
+  storage    String? // Dung lượng: "128GB", "256GB", "1TB" (nếu có)
+  price      Decimal
+  stock      Int
+
+  product   Product     @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  CartItem  CartItem[]
+  OrderItem OrderItem[]
+
+  @@map("product_variants")
+}
+
+model Category {
+  category_id Int       @id @default(autoincrement())
+  name        String // iPhone, iPad, MacBook, AirPods
+  products    Product[]
+
+  @@map("categories")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  name       String?  @db.VarChar(255)
+  password   String
+  email      String   @unique @db.VarChar(255)
+  phone      String?  @db.VarChar(255)
+  address    String?
+  role       Role     @default(customer)
+  avatar     String?  @db.VarChar(255)
+  created_at DateTime @default(now())
+
+  carts   Cart[]
+  reviews Review[]
+  orders  Order[]
+
+  @@map("users")
+}
+
+enum Role {
+  admin
+  customer
+}
+
+model Cart {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  created_at DateTime @default(now())
+
+  user  User       @relation(fields: [user_id], references: [id])
+  items CartItem[]
+
+  @@map("cart")
+}
+
+model CartItem {
+  item_id    Int @id @default(autoincrement())
+  cart_id    Int
+  variant_id Int
+  quantity   Int
+
+  cart    Cart           @relation(fields: [cart_id], references: [id])
+  variant ProductVariant @relation(fields: [variant_id], references: [id])
+
+  @@map("cart_items")
+}
+
+model Order {
+  order_id     Int         @id @default(autoincrement())
+  user_id      Int
+  total_amount Decimal
+  status       OrderStatus @default(pending)
+  created_at   DateTime    @default(now())
+
+  user  User        @relation(fields: [user_id], references: [id])
+  items OrderItem[]
+
+  @@map("orders")
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  shipped
+  delivered
+  cancelled
+}
+
+model OrderItem {
+  order_item_id Int     @id @default(autoincrement())
+  order_id      Int
+  variant_id    Int
+  quantity      Int
+  unit_price    Decimal
+
+  order   Order          @relation(fields: [order_id], references: [order_id])
+  variant ProductVariant @relation(fields: [variant_id], references: [id])
+
+  @@map("order_items")
+}
+
+model Review {
+  review_id  Int      @id @default(autoincrement())
+  user_id    Int
+  product_id Int
+  rating     Int
+  comment    String?
+  created_at DateTime @default(now())
+
+  user    User    @relation(fields: [user_id], references: [id])
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@map("reviews")
+}

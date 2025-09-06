@@ -1,0 +1,107 @@
+< !DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="TNH Store " />
+        <meta name="author" content="Hisuirika" />
+        <title>Manager User</title>
+        <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+        <link href="/admin/css/styles.css" rel="stylesheet" />
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+        <!-- <script>
+            $(document).ready(() => {
+                const avatarFile = $("#avatarFile");
+                avatarFile.change(function (e) {
+                    const imgURL = URL.createObjectURL(e.target.files[0]);
+                    $("#avatarPreview").attr("src", imgURL);
+                    $("#avatarPreview").css({ "display": "block" });
+                });
+            });
+        </script> -->
+
+
+    </head>
+
+    <body class="sb-nav-fixed">
+        <%- include('../layout/header'); %>
+
+            <div id="layoutSidenav">
+                <%- include('../layout/sidenav'); %>
+
+                    <div id="layoutSidenav_content">
+                        <main>
+                            <div class="container-fluid px-4">
+                                <h1 class="mt-4">Manage Users</h1>
+                                <ol class="breadcrumb mb-4">
+                                    <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                                    <li class="breadcrumb-item active">Users</li>
+                                </ol>
+
+                                <div style="width:600px; margin:50px auto">
+                                    <h4>Create User</h4>
+                                    <hr />
+                                    <form action="/admin/create-user" method="post">
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Email:</label>
+                                            <input type="email" name="email" class="form-control"
+                                                placeholder="name@example.com">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Full name:</label>
+                                            <input type="text" name="name" class="form-control" placeholder="your name">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Passwword:</label>
+                                            <input type="text" name="password" class="form-control" />
+                                        </div>
+                                        <div class="row">
+                                            <div class="mb-3 col-6">
+                                                <label class="form-label">Phone:</label>
+                                                <input type="text" name="phone" class="form-control"
+                                                    placeholder="your phone">
+                                            </div>
+                                            <div class="mb-3 col-6">
+                                                <label class="form-label">Role:</label>
+                                                <select name="role" class="form-select"
+                                                    aria-label="Default select example">
+                                                    <option selected value="customer">Customer
+                                                    </option>
+                                                    <option value="admin">Admin
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Address:</label>
+                                            <textarea class="form-control" name="address" rows="3"></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <button type="submit" class="btn btn-warning">ADD USER</button>
+                                        </div>
+                                    </form>
+                                </div>
+
+
+                            </div>
+
+                        </main>
+                        <%- include('../layout/footer'); %>
+
+                    </div>
+            </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+                crossorigin="anonymous"></script>
+            <script src="/admin/js/scripts.js"></script>
+
+    </body>
+
+    </html>
