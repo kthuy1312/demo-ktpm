@@ -17,7 +17,7 @@ const generateToken = (user: any) => {
             role: user.role,
         },
         process.env.JWT_SECRET!,
-        { expiresIn: "1h" }
+        { expiresIn: "3h" }
     );
 }
 
@@ -41,4 +41,13 @@ const createUser = async (name: string, email: string, password: string) => {
     })
 }
 
-export { generateToken, isEmailExist, createUser, hashPassword }
+const getUserSumCart = async (user_id: number) => {
+    const user = await prisma.cart.findUnique({
+        where: { user_id: user_id },
+    });
+
+
+    return user?.sum ?? 0;
+}
+
+export { generateToken, isEmailExist, createUser, hashPassword, getUserSumCart }
