@@ -18,6 +18,7 @@ const api = (app: Express) => {
 
     //
     router.post("/add-product/:id", verifyToken, postAddProductToCart)
+    router.get("/cart", verifyToken, getCart)
 
 
 

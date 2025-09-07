@@ -99,7 +99,34 @@ const postAddProductToCart = async (req: Request, res: Response) => {
 
 }
 
+// -------------------- GET CART -------------------------------
 
+const getCart = async (req: Request, res: Response) => {
+    // trả về tất cả sản phẩm trong giỏ hàng , totalPrice,
+    // trả về luôn cardId cho các bước 
+    const user = req.user;
+    try {
+        const cartDetails = await getProductInCart(+user.id);
+        const totalPrice = cartDetails?.map(item => (item.quantity * +item.price))
+            ?.reduce((a, b) => a + b, 0); // tính tổng
+        const cartId = cartDetails.length ? cartDetails[0].cart_id : 0
+        res.status(200).json({
+            success: true,
+            cart_detail: cartDetails,
+            totalPrice,
+            cartId
+        });
+    }
+    catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: "Có lỗi xảy ra khi lấy thông tin giỏ hàng",
+            error,
+        });
+
+    }
+
+}
 
 
 export {
