@@ -1,3 +1,6 @@
+///<reference path="./types/index.d.ts" />
+
+
 import express from 'express'
 import webRoutes from 'routes/web'
 import initDatabase from 'config/seed'
@@ -29,6 +32,12 @@ app.use(express.static('public'))
 //config passport
 configPassport();
 app.use(passport.initialize());
+
+//config global
+app.use((req, res, next) => {
+    res.locals.user = req.user || null; // Pass user object to all views
+    next();
+});
 
 
 //cors

@@ -1,7 +1,8 @@
 
 import { prisma } from 'config/client'
 import { Response, Request } from 'express'
-import { countTotalProductClientPages, fetchAllProducts, fetchProductsPaginated, getAllCategory, getProductById } from 'services/product-service';
+import { addProductToCart, countTotalProductClientPages, fetchAllProducts, fetchProductsPaginated, getAllCategory, getProductById, getProductInCart } from 'services/product-service';
+import { success } from 'zod';
 
 
 const getProductsPaginate = async (req: Request, res: Response) => {
@@ -72,7 +73,35 @@ const getCategory = async (req: Request, res: Response) => {
 }
 
 
+// -------------------- ADD PRODUCT TO CART -------------------------------
+
+const postAddProductToCart = async (req: Request, res: Response) => {
+    const id_variant = req.params.id;
+    const user = req.user;
+    try {
+
+        await addProductToCart(1, +id_variant, user);
+
+
+        res.status(201).json({
+            success: true,
+            message: "Thêm sản phẩm vào giỏ hàng thành công",
+        });
+    }
+    catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: "Có lỗi xảy ra khi thêm sản phẩm",
+            error,
+        });
+
+    }
+
+}
+
+
+
 
 export {
-    getProductsPaginate, getDetailProduct, getCategory, getAllProducts
+    getProductsPaginate, getDetailProduct, getCategory, getAllProducts, postAddProductToCart, getCart
 }

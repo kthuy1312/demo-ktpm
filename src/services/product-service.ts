@@ -62,9 +62,79 @@ const countTotalProductClientPages = async (pageSize: number) => {
     return totalPages
 };
 
+//add product
+const addProductToCart = async (quantity: number, id_variant: number, user: Express.User) => {
+    const cart = await prisma.cart.findUnique({ where: { user_id: user.id } })
+
+    const variant = await prisma.productVariant.findUnique({ where: { id: id_variant } })
+
+
+    //    nếu đã có giỏ hàng
+    //      -> cập nhật giỏ hàng
+    //      -> cập nhật chi tiết giỏ hàng -> nếu chưa có, tạo mới.có rồi, cập nhật quantity -> update + insert
+
+    if (cart) {
+        await prisma.cart.update({
+            where: { id: cart.id },
+            data: {
+                sum: {
+                    increment: quantity,
+                }
+            }
+        })
+
+        const currentCartItem = await prisma.cartItem.findFirst({
+            where: {
+                cart_id: cart.id,
+                variant_id: id_variant
+            }
+        })
+
+        await prisma.cartItem.upsert({
+            where: {
+                item_id: currentCartItem?.item_id ?? 0
+            },
+            update: {
+                quantity: {
+                    increment: quantity
+                }
+            },
+            create: {
+                price: variant.price,
+                quantity: quantity,
+                variant_id: id_variant,
+                cart_id: cart.id
+            }
+        })
+    }
+    else {
+        // nếu chưa có giỏ hàng
+        //    -> tạo mới giỏ hàng
+        //    -> tạo mới chi tiết giỏ hàng
+
+        await prisma.cart.create({
+            data: {
+                user_id: user.id,
+                sum: quantity,
+                items: {
+                    create: [
+                        {
+                            variant_id: variant.id,
+                            price: variant.price,
+                            quantity: quantity
+                        }
+                    ]
+                }
+            },
+
+        })
+    }
+}
+
+
 
 
 export {
     getAllCategory, handleDeleteProduct, getProductById,
-    countTotalProductClientPages, fetchProductsPaginated, fetchAllProducts
+    countTotalProductClientPages, fetchProductsPaginated, fetchAllProducts, addProductToCart, getProductInCart
 }

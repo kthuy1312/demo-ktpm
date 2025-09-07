@@ -76,7 +76,8 @@ enum Role {
 
 model Cart {
   id         Int      @id @default(autoincrement())
-  user_id    Int
+  user_id    Int      @unique
+  sum        Int
   created_at DateTime @default(now())
 
   user  User       @relation(fields: [user_id], references: [id])
@@ -86,13 +87,13 @@ model Cart {
 }
 
 model CartItem {
-  item_id    Int @id @default(autoincrement())
+  item_id    Int            @id @default(autoincrement())
   cart_id    Int
   variant_id Int
   quantity   Int
-
-  cart    Cart           @relation(fields: [cart_id], references: [id])
-  variant ProductVariant @relation(fields: [variant_id], references: [id])
+  price      Decimal
+  cart       Cart           @relation(fields: [cart_id], references: [id])
+  variant    ProductVariant @relation(fields: [variant_id], references: [id])
 
   @@map("cart_items")
 }
