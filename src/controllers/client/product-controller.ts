@@ -1,7 +1,7 @@
 
 import { prisma } from 'config/client'
 import { Response, Request } from 'express'
-import { addProductToCart, countTotalProductClientPages, fetchAllProducts, fetchProductsPaginated, getAllCategory, getProductById, getProductInCart, handleDeleteProductInCart } from 'services/product-service';
+import { addProductToCart, countTotalProductClientPages, fetchAllProducts, fetchProductsPaginated, getAllCategory, getProductById, getProductInCart, handleDeleteProductInCart, updateCartDetailBeforeCheckout } from 'services/product-service';
 import { success } from 'zod';
 
 
@@ -151,8 +151,36 @@ const deleteProductInCart = async (req: Request, res: Response) => {
 
 }
 
+//------------------------------------CHECKOUT----------------------------------------------
+const postHandleCartToCheckOut = async (req: Request, res: Response) => {
+
+    //đặt hàng truyền idCart , quantity , variantID
+    const { cart_id, cartDetails } = req.body as {
+        cart_id: string,
+        cartDetails: { item_id: string, quantity: string }[]
+    }
+    try {
+
+        await updateCartDetailBeforeCheckout(cart_id, cartDetails);
+        res.status(200).json({
+            success: true,
+            message: "Cập nhật thông tin giỏ hàng thành công, chuẩn bị checkout",
+        });
+
+    }
+    catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+
+    }
+
+}
+
 
 
 export {
-    getProductsPaginate, getDetailProduct, getCategory, getAllProducts, postAddProductToCart, getCart, deleteProductInCart
+    getProductsPaginate, getDetailProduct, getCategory, getAllProducts, postAddProductToCart, getCart, deleteProductInCart,
+    postHandleCartToCheckOut
 }

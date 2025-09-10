@@ -99,11 +99,16 @@ model CartItem {
 }
 
 model Order {
-  order_id     Int         @id @default(autoincrement())
-  user_id      Int
-  total_amount Decimal
-  status       OrderStatus @default(pending)
-  created_at   DateTime    @default(now())
+  order_id        Int         @id @default(autoincrement())
+  user_id         Int
+  total_amount    Decimal
+  receiverAddress String      @db.VarChar(255)
+  receiverName    String      @db.VarChar(255)
+  receiverPhone   String      @db.VarChar(255)
+  status          OrderStatus @default(PENDING)
+  paymentMethod   String //COD, BANKING...
+  paymentStatus   String //PAYMENT_UNPAID, PAYMENT_SUCCEED, PAYMENT_FAILED
+  created_at      DateTime    @default(now())
 
   user  User        @relation(fields: [user_id], references: [id])
   items OrderItem[]
@@ -112,22 +117,21 @@ model Order {
 }
 
 enum OrderStatus {
-  pending
-  confirmed
-  shipped
-  delivered
-  cancelled
+  PENDING
+  CANCELED
+  COMPLETE
 }
 
 model OrderItem {
   order_item_id Int     @id @default(autoincrement())
-  order_id      Int
-  variant_id    Int
   quantity      Int
-  unit_price    Decimal
+  price         Decimal
 
-  order   Order          @relation(fields: [order_id], references: [order_id])
-  variant ProductVariant @relation(fields: [variant_id], references: [id])
+  order    Order @relation(fields: [order_id], references: [order_id])
+  order_id Int
+
+  variant    ProductVariant @relation(fields: [variant_id], references: [id])
+  variant_id Int
 
   @@map("order_items")
 }
