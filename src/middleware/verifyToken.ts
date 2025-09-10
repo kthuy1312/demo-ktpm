@@ -11,7 +11,7 @@ const verifyAsync = promisify<string, string, any>(jwt.verify);
 export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers['authorization'];
     if (!authHeader) {
-        return res.status(403).json({ message: 'Xin vui lòng đăng nhập' });
+        return res.status(403).json({ message: 'Xin vui lòng đăng nhập để tiếp tục' });
     }
 
     const token = authHeader.split(' ')[1]; // Extract the token from "Bearer <token>"
