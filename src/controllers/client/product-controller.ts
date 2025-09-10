@@ -1,7 +1,7 @@
 
 import { prisma } from 'config/client'
 import { Response, Request } from 'express'
-import { addProductToCart, countTotalProductClientPages, fetchAllProducts, fetchProductsPaginated, getAllCategory, getProductById, getProductInCart, handleDeleteProductInCart, updateCartDetailBeforeCheckout } from 'services/product-service';
+import { addProductToCart, countTotalProductClientPages, fetchAllProducts, fetchProductsPaginated, getAllCategory, getProductById, getProductInCart, handleDeleteProductInCart, handlePlaceOrder, updateCartDetailBeforeCheckout } from 'services/product-service';
 import { success } from 'zod';
 
 
@@ -203,10 +203,36 @@ const getCheckOutPage = async (req: Request, res: Response) => {
     }
 };
 
+const postPlaceOrder = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user.id
+        const { receiverName, receiverAddress, receiverPhone, totalAmount } = req.body;
+
+        const message = await handlePlaceOrder(userId, receiverName, receiverAddress, receiverPhone, totalAmount);
+        if (message) {
+            return res.status(400).json({
+                success: false,
+                message: message,
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Đặt hàng thành công",
+
+        });
+    } catch (error: any) {
+        return res.status(500).json({
+            success: false,
+            message: "Có lỗi xảy ra khi đặt hàng",
+            error: error.message
+        });
+    }
+};
+
 
 
 
 export {
     getProductsPaginate, getDetailProduct, getCategory, getAllProducts, postAddProductToCart, getCart, deleteProductInCart,
-    postHandleCartToCheckOut, getCheckOutPage
+    postHandleCartToCheckOut, getCheckOutPage, postPlaceOrder
 }

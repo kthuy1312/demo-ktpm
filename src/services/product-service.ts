@@ -237,9 +237,122 @@ const updateCartDetailBeforeCheckout = async (
     })
 };
 
+//place order
+const handlePlaceOrder = async (
+    userId: number,
+    receiverName: string,
+    receiverAddress: string,
+    receiverPhone: string,
+    totalAmount: number
+) => {
+    try {
+        //tạo transaction
+        await prisma.$transaction(async (tx) => {
+            const cart = await tx.cart.findUnique({
+                where: {
+                    user_id: userId
+                },
+                include: {
+                    items: true
+                }
+            })
+
+            if (!cart) {
+                throw new Error("Giỏ hàng không tồn tại");
+            }
+
+
+            if (cart.items.length === 0) {
+                throw new Error("Giỏ hàng trống, không thể đặt hàng");
+            }
+
+
+
+            //create order + orderItems
+            const dataOrderItem = cart?.items?.map(
+                item => ({
+                    variant_id: item.variant_id,
+                    quantity: item.quantity,
+                    price: item.price
+                })
+            )
+            await tx.order.create({
+                data: {
+                    user_id: userId,
+                    total_amount: totalAmount,
+                    status: "PENDING",
+                    paymentMethod: "COD",
+                    paymentStatus: "PAYMENT_UNPAID",
+                    receiverName,
+                    receiverAddress,
+                    receiverPhone,
+                    items: {
+                        create: dataOrderItem
+                    }
+
+                }
+            })
+
+            //delete cart + cartItems
+            await tx.cartItem.deleteMany({
+                where: {
+                    cart_id: cart.id
+                }
+            })
+            await tx.cart.delete({
+                where: {
+                    id: cart.id
+                }
+            })
+
+            //check variant
+            for (let i = 0; i < cart.items.length; i++) {
+                const variantId = cart.items[i].variant_id
+                const variant = await tx.productVariant.findUnique(
+                    {
+                        where: {
+                            id: variantId
+                        }
+                        , include: {
+                            product: true
+                        }
+                    })
+
+
+                if (!variant || variant.stock < cart.items[i].quantity) {
+                    throw new Error(`Sản phẩm ${variant?.product.name} màu ${variant?.color} không tồn tại hoặc không đủ số lượng.`)
+                }
+
+                //đủ spham thì trừ stock
+                await tx.productVariant.update({
+                    where: {
+                        id: variantId
+                    },
+                    data: {
+                        stock: {
+                            decrement: cart.items[i].quantity
+                        },
+                        sold: {
+                            increment: cart.items[i].quantity
+                        }
+                    }
+                })
+
+            }
+
+
+        }
+        )
+        return "";
+    }
+    catch (error: any) {
+        return error.message
+    }
+};
+
 
 export {
     getAllCategory, handleDeleteProduct, getProductById,
     countTotalProductClientPages, fetchProductsPaginated, fetchAllProducts, addProductToCart, getProductInCart
-    , handleDeleteProductInCart, updateCartDetailBeforeCheckout
+    , handleDeleteProductInCart, updateCartDetailBeforeCheckout, handlePlaceOrder
 }

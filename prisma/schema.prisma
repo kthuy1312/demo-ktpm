@@ -35,6 +35,7 @@ model ProductVariant {
   storage    String? // Dung lượng: "128GB", "256GB", "1TB" (nếu có)
   price      Decimal
   stock      Int
+  sold       Int?    @default(0)
 
   product   Product     @relation(fields: [product_id], references: [id], onDelete: Cascade)
   CartItem  CartItem[]
