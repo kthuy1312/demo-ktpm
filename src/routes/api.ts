@@ -1,6 +1,6 @@
 
 import { loginWithJWT } from 'controllers/client/auth-controller'
-import { getProductsPaginate, getCategory, getDetailProduct, getAllProducts, postAddProductToCart, getCart, deleteProductInCart, postHandleCartToCheckOut, getCheckOutPage, postPlaceOrder, } from 'controllers/client/product-controller'
+import { getProductsPaginate, getCategory, getDetailProduct, getAllProducts, postAddProductToCart, getCart, deleteProductInCart, postHandleCartToCheckOut, getCheckOutPage, postPlaceOrder, postAddToCartFromDetailPage, } from 'controllers/client/product-controller'
 import express, { Express } from 'express'
 import passport from 'passport'
 import { verifyToken } from 'src/middleware/verifyToken'
@@ -20,6 +20,7 @@ const api = (app: Express) => {
     router.post("/add-product/:id", verifyToken, postAddProductToCart)
     router.get("/cart", verifyToken, getCart)
     router.delete("/delete-product/:id", verifyToken, deleteProductInCart)
+    router.post("/add-to-cart-from-detail-page/:id", verifyToken, postAddToCartFromDetailPage)
 
     //checkout
     router.post("/handle-cart-to-checkout", verifyToken, postHandleCartToCheckOut); //cập nhật giỏ hàng trước khi checkout

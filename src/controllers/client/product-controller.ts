@@ -98,6 +98,29 @@ const postAddProductToCart = async (req: Request, res: Response) => {
     }
 
 }
+const postAddToCartFromDetailPage = async (req: Request, res: Response) => {
+    const id_variant = req.params.id;
+    const user = req.user;
+    const quantity = req.body.quantity
+
+    try {
+
+        await addProductToCart(+quantity, +id_variant, user);
+        res.status(201).json({
+            success: true,
+            message: "Thêm sản phẩm vào giỏ hàng thành công",
+        });
+    }
+    catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: "Có lỗi xảy ra khi thêm sản phẩm",
+            error,
+        });
+
+    }
+
+}
 
 // -------------------- GET CART -------------------------------
 
@@ -234,5 +257,5 @@ const postPlaceOrder = async (req: Request, res: Response) => {
 
 export {
     getProductsPaginate, getDetailProduct, getCategory, getAllProducts, postAddProductToCart, getCart, deleteProductInCart,
-    postHandleCartToCheckOut, getCheckOutPage, postPlaceOrder
+    postHandleCartToCheckOut, getCheckOutPage, postPlaceOrder, postAddToCartFromDetailPage
 }
