@@ -1,6 +1,6 @@
 
 import { loginWithJWT } from 'controllers/client/auth-controller'
-import { getProductsPaginate, getCategory, getDetailProduct, getAllProducts, postAddProductToCart, getCart, deleteProductInCart, postHandleCartToCheckOut, getCheckOutPage, postPlaceOrder, postAddToCartFromDetailPage, } from 'controllers/client/product-controller'
+import { getProductsPaginate, getCategory, getDetailProduct, getAllProducts, postAddProductToCart, getCart, deleteProductInCart, postHandleCartToCheckOut, getCheckOutPage, postPlaceOrder, postAddToCartFromDetailPage, getOrderHistory, } from 'controllers/client/product-controller'
 import express, { Express } from 'express'
 import passport from 'passport'
 import { verifyToken } from 'src/middleware/verifyToken'
@@ -27,6 +27,8 @@ const api = (app: Express) => {
     router.get("/checkout", verifyToken, getCheckOutPage); //lấy thông tin giỏ hàng của user chuẩn bị thanh toán
     router.post("/place-order", verifyToken, postPlaceOrder); // thực hiện đặt hàng
 
+    //order
+    router.get("/order-history", verifyToken, getOrderHistory);
 
 
 
