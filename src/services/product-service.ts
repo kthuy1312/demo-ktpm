@@ -396,6 +396,22 @@ const handlePostReview = async (userId: number, productId: number, rating: numbe
         throw new Error("Có lỗi xảy ra khi viết phản hồi");
     }
 };
+const handleGetReview = async (productId: number) => {
+    try {
+        return await prisma.review.findMany({
+            where: {
+                product_id: productId
+            },
+            include: {
+                user: true
+            }
+        })
+    }
+
+    catch (error: any) {
+        throw new Error("Có lỗi xảy ra khi lấy đánh giá sản phẩm");
+    }
+};
 
 
 
@@ -403,4 +419,5 @@ export {
     getAllCategory, handleDeleteProduct, getProductById,
     countTotalProductClientPages, fetchProductsPaginated, fetchAllProducts, addProductToCart, getProductInCart
     , handleDeleteProductInCart, updateCartDetailBeforeCheckout, handlePlaceOrder, listOrdersByUserId, handlePostReview
+    , handleGetReview
 }

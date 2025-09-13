@@ -1,7 +1,7 @@
 
 import { prisma } from 'config/client'
 import { Response, Request } from 'express'
-import { addProductToCart, countTotalProductClientPages, fetchAllProducts, fetchProductsPaginated, getAllCategory, getProductById, getProductInCart, handleDeleteProductInCart, handlePlaceOrder, handlePostReview, listOrdersByUserId, updateCartDetailBeforeCheckout } from 'services/product-service';
+import { addProductToCart, countTotalProductClientPages, fetchAllProducts, fetchProductsPaginated, getAllCategory, getProductById, getProductInCart, handleDeleteProductInCart, handleGetReview, handlePlaceOrder, handlePostReview, listOrdersByUserId, updateCartDetailBeforeCheckout } from 'services/product-service';
 import { success } from 'zod';
 
 
@@ -286,6 +286,9 @@ const postReview = async (req: Request, res: Response) => {
         if (!rating) {
             return res.status(400).json({ message: "Vui lòng đánh giá mức độ hài lòng về sản phẩm" });
         }
+        if (rating > 5) {
+            return res.status(400).json({ message: "Vui lòng đánh giá mức độ hài lòng về sản phẩm từ 1 đến 5 sao" });
+        }
 
         const reviewData = await handlePostReview(userId, +productId, +rating, comment)
         return res.status(200).json({
@@ -301,10 +304,28 @@ const postReview = async (req: Request, res: Response) => {
     }
 };
 
+const getReview = async (req: Request, res: Response) => {
+    try {
+        const id = req.params.id;
+        const data = await handleGetReview(+id)
+        return res.status(200).json({
+            success: true,
+            message: "Lấy đánh giá của sản phẩm thành công",
+            data
+        });
+    } catch (error: any) {
+        return res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+};
+
 
 
 
 export {
     getProductsPaginate, getDetailProduct, getCategory, getAllProducts, postAddProductToCart, getCart, deleteProductInCart,
-    postHandleCartToCheckOut, getCheckOutPage, postPlaceOrder, postAddToCartFromDetailPage, getOrderHistory, postReview
+    postHandleCartToCheckOut, getCheckOutPage, postPlaceOrder, postAddToCartFromDetailPage, getOrderHistory, postReview,
+    getReview
 }
