@@ -1,6 +1,6 @@
 
 import { loginWithJWT } from 'controllers/client/auth-controller'
-import { getProductsPaginate, getCategory, getDetailProduct, getAllProducts, postAddProductToCart, getCart, deleteProductInCart, postHandleCartToCheckOut, getCheckOutPage, postPlaceOrder, postAddToCartFromDetailPage, getOrderHistory, } from 'controllers/client/product-controller'
+import { getProductsPaginate, getCategory, getDetailProduct, getAllProducts, postAddProductToCart, getCart, deleteProductInCart, postHandleCartToCheckOut, getCheckOutPage, postPlaceOrder, postAddToCartFromDetailPage, getOrderHistory, postReview, } from 'controllers/client/product-controller'
 import express, { Express } from 'express'
 import passport from 'passport'
 import { verifyToken } from 'src/middleware/verifyToken'
@@ -30,6 +30,8 @@ const api = (app: Express) => {
     //order
     router.get("/order-history", verifyToken, getOrderHistory);
 
+    //review
+    router.post("/review", verifyToken, postReview);
 
 
 

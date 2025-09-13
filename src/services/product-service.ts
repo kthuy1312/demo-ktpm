@@ -49,6 +49,14 @@ const getProductById = async (id: string) => {
     return await prisma.product.findUnique({
         where: {
             id: +id
+        },
+        include: {
+            category: {
+                select: {
+                    name: true,
+                },
+            },
+            variants: true
         }
     })
 };
@@ -371,9 +379,28 @@ const listOrdersByUserId = async (userId: number) => {
 };
 
 
+// review
+const handlePostReview = async (userId: number, productId: number, rating: number, comment: string) => {
+    try {
+        return await prisma.review.create({
+            data: {
+                user_id: userId,
+                product_id: productId,
+                rating,
+                comment
+            }
+        })
+    }
+
+    catch (error: any) {
+        throw new Error("Có lỗi xảy ra khi viết phản hồi");
+    }
+};
+
+
 
 export {
     getAllCategory, handleDeleteProduct, getProductById,
     countTotalProductClientPages, fetchProductsPaginated, fetchAllProducts, addProductToCart, getProductInCart
-    , handleDeleteProductInCart, updateCartDetailBeforeCheckout, handlePlaceOrder, listOrdersByUserId
+    , handleDeleteProductInCart, updateCartDetailBeforeCheckout, handlePlaceOrder, listOrdersByUserId, handlePostReview
 }

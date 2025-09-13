@@ -1,7 +1,7 @@
 
 import { prisma } from 'config/client'
 import { Response, Request } from 'express'
-import { addProductToCart, countTotalProductClientPages, fetchAllProducts, fetchProductsPaginated, getAllCategory, getProductById, getProductInCart, handleDeleteProductInCart, handlePlaceOrder, listOrdersByUserId, updateCartDetailBeforeCheckout } from 'services/product-service';
+import { addProductToCart, countTotalProductClientPages, fetchAllProducts, fetchProductsPaginated, getAllCategory, getProductById, getProductInCart, handleDeleteProductInCart, handlePlaceOrder, handlePostReview, listOrdersByUserId, updateCartDetailBeforeCheckout } from 'services/product-service';
 import { success } from 'zod';
 
 
@@ -9,15 +9,20 @@ const getProductsPaginate = async (req: Request, res: Response) => {
     const { page, pageSize } = req.query
     let currentPage = page ? +page : 1
     if (currentPage <= 0) currentPage = 1;
+    const totalProduct = await prisma.product.count();
     const totalPages = await countTotalProductClientPages(+pageSize);
     try {
         const products = await fetchProductsPaginated(+page, +pageSize);
         res.status(200).json({
             message: "Lấy danh sách sản phẩm thành công",
-            data: products,
             meta: {
                 totalPages,
-            }
+                current: page,
+                pageSize,
+                totalProduct
+            },
+            data: products,
+
         });
     } catch (err: any) {
         res.status(500).json({
@@ -271,11 +276,35 @@ const getOrderHistory = async (req: Request, res: Response) => {
         });
     }
 };
+//------------------------------------REVIEW----------------------------------------------
+
+const postReview = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user.id
+        const { productId, rating, comment } = req.body;
+
+        if (!rating) {
+            return res.status(400).json({ message: "Vui lòng đánh giá mức độ hài lòng về sản phẩm" });
+        }
+
+        const reviewData = await handlePostReview(userId, +productId, +rating, comment)
+        return res.status(200).json({
+            success: true,
+            message: "Đánh giá thành công",
+            reviewData
+        });
+    } catch (error: any) {
+        return res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+};
 
 
 
 
 export {
     getProductsPaginate, getDetailProduct, getCategory, getAllProducts, postAddProductToCart, getCart, deleteProductInCart,
-    postHandleCartToCheckOut, getCheckOutPage, postPlaceOrder, postAddToCartFromDetailPage, getOrderHistory
+    postHandleCartToCheckOut, getCheckOutPage, postPlaceOrder, postAddToCartFromDetailPage, getOrderHistory, postReview
 }
